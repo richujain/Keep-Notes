@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,10 +25,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 public class CategoryList extends AppCompatActivity {
 
+    public static SQLiteHelper sqLiteHelper;
     private static final String TAG = "MainActivity";
     private static final int NUM_COLUMNS = 2;
 
@@ -44,6 +49,8 @@ public class CategoryList extends AppCompatActivity {
         setContentView(R.layout.activity_category_list);
 
         initImageBitmaps();
+        sqLiteHelper = new SQLiteHelper(this, "TasksDB.sqlite", null, 1);
+        sqLiteHelper.queryData("CREATE TABLE IF NOT EXISTS CATEGORY(ID INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR,image BLOB)");
     }
 
     private void initImageBitmaps(){
@@ -137,8 +144,6 @@ public class CategoryList extends AppCompatActivity {
                 case GALLERY_REQUEST_CODE:
                     //data.getData returns the content URI for the selected Image
                     Uri selectedImage = data.getData();
-                    Log.v("Selected Image : ",""+selectedImage);
-                    Log.v("imageview",""+imageView);
                     this.imageView.setImageURI(selectedImage);
                     break;
             }
@@ -173,7 +178,18 @@ public class CategoryList extends AppCompatActivity {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                categoryName = input.getText().toString();
+                categoryName = input.getText().toString().trim();
+                //insert
+                try{
+                    sqLiteHelper.insertData(
+                            categoryName,imageViewToByte(imageView)
+                    );
+                    Toast.makeText(CategoryList.this, "Added Successfully", Toast.LENGTH_SHORT).show();
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -186,7 +202,15 @@ public class CategoryList extends AppCompatActivity {
         builder.show();
     }
 
+    private byte[] imageViewToByte(ImageView imageView) {
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        return  byteArray;
+    }
 
+    
 
 
 }
