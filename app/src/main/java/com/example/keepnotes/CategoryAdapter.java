@@ -1,6 +1,7 @@
 package com.example.keepnotes;
 
 import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.lang.reflect.Array;
+import java.sql.Blob;
 import java.util.ArrayList;
 
 /**
@@ -25,11 +27,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     private static final String TAG = "StaggeredRecyclerViewAd";
 
     private ArrayList<String> mNames = new ArrayList<>();
-    private ArrayList<String> mImageUrls = new ArrayList<>();
+    private ArrayList<byte[]> mImageUrls = new ArrayList<>();
+    private ArrayList<Integer> mId = new ArrayList<>();
     private Context mContext;
 
-    public CategoryAdapter(Context context, ArrayList<String> names, ArrayList<String> imageUrls) {
+    public CategoryAdapter(Context context, ArrayList<Integer> id, ArrayList<String> names, ArrayList<byte[]> imageUrls) {
         mNames = names;
+        mId = id;
         mImageUrls = imageUrls;
         mContext = context;
     }
@@ -52,6 +56,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 .apply(requestOptions)
                 .into(holder.image);
 
+
+
         holder.name.setText(mNames.get(position));
 
         holder.image.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +69,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         });
 
     }
+
 
     @Override
     public int getItemCount() {

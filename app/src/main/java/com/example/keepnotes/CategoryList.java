@@ -9,9 +9,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
@@ -25,9 +26,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 public class CategoryList extends AppCompatActivity {
 
@@ -35,9 +34,10 @@ public class CategoryList extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int NUM_COLUMNS = 2;
 
-    private ArrayList<String> mImageUrls = new ArrayList<>();
+    private ArrayList<byte[]> mImages = new ArrayList<byte[]>();
     private ArrayList<String> mNames = new ArrayList<>();
-
+    //
+    ArrayList<Integer> id;
     //user input
     ImageView imageView;
     String categoryName = "";
@@ -48,15 +48,16 @@ public class CategoryList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_category_list);
 
-        initImageBitmaps();
+
         sqLiteHelper = new SQLiteHelper(this, "TasksDB.sqlite", null, 1);
         sqLiteHelper.queryData("CREATE TABLE IF NOT EXISTS CATEGORY(ID INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR,image BLOB)");
+        initImageBitmaps();
     }
 
     private void initImageBitmaps(){
         Log.d(TAG, "initImageBitmaps: preparing bitmaps.");
 
-        mImageUrls.add("https://c1.staticflickr.com/5/4636/25316407448_de5fbf183d_o.jpg");
+       /* mImageUrls.add("https://c1.staticflickr.com/5/4636/25316407448_de5fbf183d_o.jpg");
         mNames.add("Havasu Falls");
 
         mImageUrls.add("https://i.redd.it/tpsnoz5bzo501.jpg");
@@ -85,8 +86,8 @@ public class CategoryList extends AppCompatActivity {
         mImageUrls.add("https://i.imgur.com/ZcLLrkY.jpg");
         mNames.add("Washington");
 
-
-
+*/
+       fetchData();
         initRecyclerView();
 
     }
@@ -96,7 +97,7 @@ public class CategoryList extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         CategoryAdapter staggeredRecyclerViewAdapter =
-                new CategoryAdapter(this, mNames, mImageUrls);
+                new CategoryAdapter(this, id, mNames, mImages);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerView.setAdapter(staggeredRecyclerViewAdapter);
@@ -152,6 +153,35 @@ public class CategoryList extends AppCompatActivity {
 
     }
 
+    private void fetchData(){
+        mImages.clear();
+        mNames.clear();
+
+        sqLiteHelper = new SQLiteHelper(this, "TasksDB.sqlite", null, 1);
+        SQLiteDatabase db = sqLiteHelper.getWritableDatabase();
+        String sql = "SELECT * FROM CATEGORY";
+        Cursor cursor = db.rawQuery(sql, new String[] {});
+        if(cursor.moveToFirst()) {
+            do{
+                this.mNames.add(cursor.getString(1));
+                this.mImages.add(cursor.getBlob(2));
+            }
+            while (cursor.moveToNext());
+        }
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+        /*if(cursor.moveToFirst()){
+           // this.id.add(cursor.getInt(0));
+            this.mNames.add(cursor.getString(1));
+            this.mImages.add(cursor.getBlob(2));
+        }
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }*/
+        db.close();
+    }
+
     private void addCategory(){
         categoryName = "";
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -187,6 +217,7 @@ public class CategoryList extends AppCompatActivity {
                             categoryName,imageViewToByte(imageView)
                     );
                     Toast.makeText(CategoryList.this, "Added Successfully", Toast.LENGTH_SHORT).show();
+                    initImageBitmaps();
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -211,7 +242,6 @@ public class CategoryList extends AppCompatActivity {
         byte[] byteArray = stream.toByteArray();
         return  byteArray;
     }
-
 
 
 
