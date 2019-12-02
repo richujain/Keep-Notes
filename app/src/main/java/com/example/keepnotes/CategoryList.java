@@ -85,6 +85,8 @@ public class CategoryList extends AppCompatActivity {
         mImageUrls.add("https://i.imgur.com/ZcLLrkY.jpg");
         mNames.add("Washington");
 
+
+
         initRecyclerView();
 
     }
@@ -210,7 +212,7 @@ public class CategoryList extends AppCompatActivity {
         return  byteArray;
     }
 
-    
+
 
 
 }
