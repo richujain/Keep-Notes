@@ -3,38 +3,36 @@ package com.example.keepnotes;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.lang.reflect.Array;
-import java.sql.Blob;
 import java.util.ArrayList;
 
 /**
  * Created by User on 1/17/2018.
  */
 
-public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
+public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> {
 
     private static final String TAG = "StaggeredRecyclerViewAd";
 
     private ArrayList<String> mNames = new ArrayList<>();
+    private ArrayList<String> mDescription = new ArrayList<>();
     private ArrayList<byte[]> mImageUrls = new ArrayList<>();
     private ArrayList<Integer> mId = new ArrayList<>();
     private Context mContext;
 
-    public CategoryAdapter(Context context, ArrayList<Integer> id, ArrayList<String> names, ArrayList<byte[]> imageUrls) {
+    public NotesAdapter(Context context, ArrayList<Integer> id, ArrayList<String> names,ArrayList<String> descriptions, ArrayList<byte[]> imageUrls) {
         mNames = names;
+        mDescription = descriptions;
         mId = id;
         mImageUrls = imageUrls;
         mContext = context;
@@ -42,9 +40,10 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_grid_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_grid_notes_list, parent, false);
         return new ViewHolder(view);
     }
+
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
@@ -59,14 +58,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
                 .into(holder.image);
 
 
-
         holder.name.setText(mNames.get(position));
+        holder.name.setText(mDescription.get(position));
 
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent myIntent = new Intent(mContext, NotesList.class);
-                Log.e("mid",""+mId.get(position));
+                Intent myIntent = new Intent(mContext, AddNotes.class);
                 myIntent.putExtra("categoryId", mId.get(position));
                 ((Activity)mContext).startActivity(myIntent);
             }
@@ -84,11 +82,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
         ImageView image;
         TextView name;
+        TextView description;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            this.image = itemView.findViewById(R.id.imageview_widget);
-            this.name = itemView.findViewById(R.id.name_widget);
+            this.image = itemView.findViewById(R.id.task_imageview_widget);
+            this.name = itemView.findViewById(R.id.task_name_widget);
+            this.description = itemView.findViewById(R.id.task_description_widget);
         }
     }
 }
