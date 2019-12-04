@@ -1,6 +1,8 @@
 package com.example.keepnotes;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,8 +65,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "onClick: clicked on: " + mNames.get(position));
-                Toast.makeText(mContext, mNames.get(position), Toast.LENGTH_SHORT).show();
+                Intent myIntent = new Intent(mContext, NotesList.class);
+                myIntent.putExtra("categoryId", mId.get(position));
+                ((Activity)mContext).startActivity(myIntent);
             }
         });
 
