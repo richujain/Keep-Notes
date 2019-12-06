@@ -57,7 +57,6 @@ public class CategoryList extends AppCompatActivity {
     private void initImageBitmaps(){
         fetchData();
         initRecyclerView();
-
     }
 
     private void initRecyclerView(){
@@ -199,6 +198,9 @@ public class CategoryList extends AppCompatActivity {
         return  byteArray;
     }
 
-
-
+    @Override
+    public void onBackPressed() {
+        finishAffinity();
+        finish();
+    }
 }

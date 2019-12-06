@@ -19,6 +19,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(sql);
     }
 
+
     public void insertData(String name,byte[] image){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         String sql = "INSERT INTO CATEGORY VALUES (NULL,?,?)";

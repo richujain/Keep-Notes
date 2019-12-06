@@ -78,6 +78,7 @@ public class AddNotes extends AppCompatActivity {
         startActivity(new Intent(AddNotes.this, NotesList.class));
         Intent myIntent = new Intent(AddNotes.this, NotesList.class);
         myIntent.putExtra("categoryId", categoryId);
+        finish();
         startActivity(myIntent);
     }
     //adding category
@@ -111,5 +112,9 @@ public class AddNotes extends AppCompatActivity {
         return  byteArray;
     }
 
-
+    @Override
+    public void onBackPressed() {
+        finish();
+        startActivity(new Intent(AddNotes.this,CategoryList.class));
+    }
 }

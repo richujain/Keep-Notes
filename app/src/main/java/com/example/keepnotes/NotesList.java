@@ -87,6 +87,7 @@ public class NotesList extends AppCompatActivity {
                 startActivity(new Intent(NotesList.this,AddNotes.class));
                 Intent myIntent = new Intent(NotesList.this, AddNotes.class);
                 myIntent.putExtra("categoryId", categoryId);
+                finish();
                 startActivity(myIntent);
                 return true;
             default:
@@ -122,9 +123,9 @@ public class NotesList extends AppCompatActivity {
         db.close();
     }
 
-
-
-
-
-
+    @Override
+    public void onBackPressed() {
+        finish();
+        startActivity(new Intent(NotesList.this,CategoryList.class));
+    }
 }
