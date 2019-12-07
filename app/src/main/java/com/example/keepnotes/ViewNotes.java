@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 public class ViewNotes extends AppCompatActivity {
 
     private EditText title,description;
+    private TextView viewOnMap;
     private Button uploadImage,saveNote;
     private ImageView uploadedImage;
     private Integer noteId;
@@ -54,6 +55,18 @@ public class ViewNotes extends AppCompatActivity {
         Intent mIntent = getIntent();
         noteId = mIntent.getIntExtra("noteId", 0);
         Log.d("noteId: ",""+noteId);
+        viewOnMap = findViewById(R.id.viewOnMap);
+        viewOnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(ViewNotes.this, MapView.class);
+                myIntent.putExtra("noteId", noteId);
+                myIntent.putExtra("lat", lat);
+                myIntent.putExtra("lon", lon);
+
+                startActivity(myIntent);
+            }
+        });
         fetchData();
         uploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
