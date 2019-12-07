@@ -2,6 +2,7 @@ package com.example.keepnotes;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -47,7 +49,6 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
-        Log.d(TAG, "onBindViewHolder: called.");
 
         RequestOptions requestOptions = new RequestOptions()
                 .placeholder(R.drawable.ic_launcher_background);
@@ -57,18 +58,51 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
                 .apply(requestOptions)
                 .into(holder.image);
 
-
         holder.name.setText(mNames.get(position));
-        holder.name.setText(mDescription.get(position));
+        holder.description.setText(mDescription.get(position));
 
         holder.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent myIntent = new Intent(mContext, AddNotes.class);
-                myIntent.putExtra("categoryId", mId.get(position));
+                Intent myIntent = new Intent(mContext, ViewNotes.class);
+                myIntent.putExtra("noteId", mId.get(position));
                 ((Activity)mContext).startActivity(myIntent);
             }
         });
+
+        holder.image.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setTitle("Are you sure you want to delete the note?");
+
+
+// Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteCategory(position);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+                return true;
+            }
+        });
+
+    }
+
+    private void deleteCategory(int position){
+        SQLiteHelper helper = new SQLiteHelper(mContext, "TasksDB.sqlite", null, 1);
+        String notes = "NOTES";
+        helper.queryData("DELETE from "+notes+" where id= '"+mId.get(position)+"'");
+        ((Activity)mContext).startActivity(new Intent(mContext,CategoryList.class));
 
     }
 

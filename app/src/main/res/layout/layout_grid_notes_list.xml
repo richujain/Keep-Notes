@@ -27,18 +27,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Canada"
                 android:id="@+id/task_name_widget"
-                android:layout_below="@+id/imageview_widget"
+                android:layout_below="@+id/task_imageview_widget"
                 android:layout_marginTop="10dp"
                 android:textColor="#000"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Canada"
                 android:id="@+id/task_description_widget"
-                android:layout_below="@+id/name_widget"
+                android:layout_below="@+id/task_name_widget"
                 android:layout_marginTop="10dp"
                 android:textColor="#000"/>
 

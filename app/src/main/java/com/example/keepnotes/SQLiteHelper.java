@@ -1,5 +1,6 @@
 package com.example.keepnotes;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -42,6 +43,28 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         sqLiteStatement.bindString(6, lon);
         sqLiteStatement.bindString(7, datetime);
         sqLiteStatement.executeInsert();
+    }
+
+    public void updateData(Integer noteId, String title,String description,byte[] image){
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        String sql = "UPDATE NOTES SET title = '"+ title +"', description = '"+ description +"' where id = '"+ noteId +"'";
+        SQLiteStatement sqLiteStatement = sqLiteDatabase.compileStatement(sql);
+        sqLiteStatement.executeUpdateDelete();
+        SQLiteDatabase database = this.getWritableDatabase();
+
+        final String[] whereArgs = { Long.toString(noteId) };
+
+
+        database.update("NOTES",createContentValues(image), "id = ?",whereArgs);
+        /*ContentValues cv = new ContentValues();
+        cv.put("title",    title);
+        //cv.put(KEY_IMAGE,   image);
+        database.insert( "NOTES", null, cv );*/
+    }
+    private ContentValues createContentValues(byte[] image) {
+        ContentValues cv = new ContentValues();
+        cv.put("image", image);
+        return cv;
     }
 
     public Cursor getData(String sql){
