@@ -12,6 +12,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+
 import java.util.ArrayList;
 public class NotesList extends AppCompatActivity {
 
@@ -21,6 +25,8 @@ public class NotesList extends AppCompatActivity {
     private ArrayList<byte[]> mImages = new ArrayList<byte[]>();
     private ArrayList<String> mNames = new ArrayList<>();
     private ArrayList<String> mDescription = new ArrayList<>();
+    EditText searchBar;
+    Button searchButton;
     //
     ArrayList<Integer> mId = new ArrayList<>();
     int categoryId;
@@ -29,12 +35,21 @@ public class NotesList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_list);
+        searchBar = findViewById(R.id.searchBar);
+        searchButton = findViewById(R.id.searchButton);
         Intent mIntent = getIntent();
         categoryId = mIntent.getIntExtra("categoryId", 0);
         sqLiteHelper = new SQLiteHelper(this, "TasksDB.sqlite", null, 1);
         sqLiteHelper.queryData("CREATE TABLE IF NOT EXISTS NOTES(ID INTEGER PRIMARY KEY AUTOINCREMENT,cid integer, title VARCHAR(100), description varchar(500),image BLOB, lat varchar(15),lon varchar(15),datetime varchar(15))");
 
         initImageBitmaps();
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchData("'%"+searchBar.getText().toString()+"%'");
+                initRecyclerView();
+            }
+        });
     }
 
     private void initImageBitmaps(){
@@ -116,6 +131,32 @@ public class NotesList extends AppCompatActivity {
         sqLiteHelper = new SQLiteHelper(this, "TasksDB.sqlite", null, 1);
         SQLiteDatabase db = sqLiteHelper.getWritableDatabase();
         String sql = "SELECT * FROM NOTES where cid = " + categoryId + " order by title";
+        Cursor cursor = db.rawQuery(sql, new String[] {});
+        if(cursor.moveToFirst()) {
+            do{
+
+                /*Log.e(""+cursor.getColumnName(2),""+cursor.getString(2));*/
+                this.mId.add(cursor.getInt(0));
+                this.mNames.add(cursor.getString(2));
+                this.mDescription.add(cursor.getString(3));
+                this.mImages.add(cursor.getBlob(4));
+
+            }
+            while (cursor.moveToNext());
+        }
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+        db.close();
+    }
+    private void searchData(String search){
+        this.mId.clear();
+        this.mNames.clear();
+        this.mDescription.clear();
+        this.mImages.clear();
+        sqLiteHelper = new SQLiteHelper(this, "TasksDB.sqlite", null, 1);
+        SQLiteDatabase db = sqLiteHelper.getWritableDatabase();
+        String sql = "SELECT * FROM NOTES where cid = " + categoryId + " and title LIKE "+search+ " or description LIKE "+search;
         Cursor cursor = db.rawQuery(sql, new String[] {});
         if(cursor.moveToFirst()) {
             do{
